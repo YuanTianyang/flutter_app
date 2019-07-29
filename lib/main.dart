@@ -2,8 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:mysql1/mysql1.dart';
+import 'package:flutter/src/widgets/basic.dart' as Basic;
+import 'common/dao/user_dao.dart';
+import 'common/model/user.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  var settings = new ConnectionSettings(
+      host: '192.168.100.134',
+      port: 3306,
+      user: 'root',
+      password: '449534640',
+      db: 'test_app',
+  );
+  print("opening mysql");
+  var conn = await MySqlConnection.connect(settings);
+  UserDao userDao = new UserDao();
+  User user = new User(3, "滴滴打人", 45, "计算机和画画", "65161321321312", "滴滴滴滴第四");
+  userDao.updateUser(conn, user);
+  print("opened mysql");
+  return runApp(MyApp());
+}
 
 //---------------容器类widget------------------
 
@@ -52,7 +71,7 @@ class _ScaffoldRouteState extends State<ScaffoldBoxTestRoute> with SingleTickerP
       bottomNavigationBar: BottomAppBar(
         color: Colors.white,
         shape: CircularNotchedRectangle(), // 底部导航栏打一个圆形的洞
-        child: Row(
+        child: Basic.Row(
           children: [
             IconButton(icon: Icon(Icons.home)),
             SizedBox(), //中间位置空出
@@ -96,7 +115,7 @@ class MyDrawer extends StatelessWidget {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
-              child: Row(
+              child: Basic.Row(
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -504,7 +523,7 @@ class FlexLayoutTestRoute extends StatelessWidget{
                   child: Container(
                     height: 30.0,
                     color: Colors.green,
-                    child: Row(
+                    child: Basic.Row(
                       children: <Widget>[
                         Text("ddd"*5,style: TextStyle(fontSize: 10.0)),
                       ],
@@ -591,7 +610,7 @@ class _RowAndColumnTestState extends State<RowAndColumnTest> {
               // 登录按钮
               Padding(
                 padding: const EdgeInsets.only(top: 30.0),
-                child: Row(
+                child: Basic.Row(
                   children: <Widget>[
                     Expanded(
                       child: RaisedButton(
@@ -617,14 +636,14 @@ class _RowAndColumnTestState extends State<RowAndColumnTest> {
                   ],
                 ),
               ),
-            Row(
+              Basic.Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text("aaaaaaaa"),
                 Text("bbbbbbbb"),
               ],
             ),
-            Row(
+              Basic.Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -632,7 +651,7 @@ class _RowAndColumnTestState extends State<RowAndColumnTest> {
                 Text("dddddddd"),
               ],
             ),
-            Row(
+              Basic.Row(
               mainAxisAlignment: MainAxisAlignment.end,
               textDirection: TextDirection.rtl,
               children: <Widget>[
@@ -640,7 +659,7 @@ class _RowAndColumnTestState extends State<RowAndColumnTest> {
                 Text("ffffffff"),
               ],
             ),
-            Row(
+              Basic.Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               verticalDirection: VerticalDirection.up,
@@ -746,7 +765,7 @@ class _FormTestRouteState extends State<FormTestRoute> {
               // 登录按钮
               Padding(
                 padding: const EdgeInsets.only(top: 30.0),
-                child: Row(
+                child: Basic.Row(
                   children: <Widget>[
                     Expanded(
                       child: RaisedButton(
