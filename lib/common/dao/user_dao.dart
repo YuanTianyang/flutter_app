@@ -1,10 +1,10 @@
 import 'package:mysql1/mysql1.dart';
 import 'package:flutter_app/common/model/user.dart';
 
+
 class UserDao {
 
   Future<int> addUser(MySqlConnection conn,User user) async {
-
     var results = await conn.query('INSERT INTO user (user_name, age, hobby, phone, address) VALUES (?, ?, ?, ?, ?)',[user.userName,user.age,user.hobby,user.phone,user.address]);
     if(0 < results.affectedRows){
       return results.insertId;

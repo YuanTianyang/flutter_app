@@ -6,22 +6,10 @@ import 'package:mysql1/mysql1.dart';
 import 'package:flutter/src/widgets/basic.dart' as Basic;
 import 'common/dao/user_dao.dart';
 import 'common/model/user.dart';
+import 'common/utils/common_utils.dart';
 
 void main() async {
-  var settings = new ConnectionSettings(
-      host: '192.168.100.134',
-      port: 3306,
-      user: 'root',
-      password: '449534640',
-      db: 'test_app',
-  );
-  print("opening mysql");
-  var conn = await MySqlConnection.connect(settings);
-  UserDao userDao = new UserDao();
-  User user = new User(3, "滴滴打人", 45, "计算机和画画", "65161321321312", "滴滴滴滴第四");
-  userDao.updateUser(conn, user);
-  print("opened mysql");
-  return runApp(MyApp());
+  return await runApp(MyApp());
 }
 
 //---------------容器类widget------------------
@@ -277,39 +265,74 @@ class ConstrainedBoXTestRoute extends StatelessWidget {
 
 //------------padding给子节点添加补白------------
 class PaddingTestRoute extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
+
     var args = ModalRoute.of(context).settings.arguments;
+
+
 
     return Scaffold(
         appBar: AppBar(
           title: Text(args),
         ),
-        body: Padding(
-          //上下左右各添加16像素补白
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            //显式指定对齐方式为左对齐，排除对齐干扰
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              /*Padding(
-                //左边添加8像素补白
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text("Hello world"),
+        body:Container(
+              child:ListView(
+                scrollDirection: Axis.horizontal,
+                children: <Widget>[
+                  Basic.Row(
+//                    mainAxisSize: MainAxisSize.min,
+//                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      MaterialButton(
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("序号"),
+                        onPressed: () => {},
+                      ),
+                      MaterialButton(
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("姓名"),
+                        onPressed: () => {},
+                      ),
+                      MaterialButton(
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("年龄"),
+                        onPressed: () => {},
+                      ),
+                      MaterialButton(
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("爱好"),
+                        onPressed: () => {},
+                      ),
+                      MaterialButton(
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("电话"),
+                        onPressed: () => {},
+                      ),
+                      MaterialButton(
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("住址"),
+                        onPressed: () => {},
+                      ),
+                      MaterialButton(
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        child: Text("操作"),
+                        onPressed: () => {},
+                      ),
+                    ],
+                  )
+                ],
               ),
-              Padding(
-                //上下各添加8像素补白
-                padding: const EdgeInsets.symmetric(vertical: 50.0),
-                child: Text("I am Jack"),
-              ),
-              Padding(
-                // 分别指定四个方向的补白
-                padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                child: Text("Your friend"),
-              )*/
-            ],
-          ),
-        )
+
+          )
     );
   }
 }
@@ -879,7 +902,8 @@ class CupertinoTestRoute extends StatelessWidget{
             CupertinoButton(
                 color: CupertinoColors.activeGreen,
                 child: Text('Benjamin'),
-                onPressed: (){}),
+                onPressed: (){}
+            ),
             TextField(
               autofocus: true,
               decoration: InputDecoration(
@@ -1286,7 +1310,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)  {
+
+    var conn = CommonUtils.Connection;
+    UserDao userDao = new UserDao();
+    var userList = userDao.getAllUser(conn, 0, 0);
+    print(userList.toString());
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -1297,7 +1327,7 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             CupertinoButton(
-              child: Text("Padding容器",style: TextStyle(color: Colors.red),),
+              child: Text("PaddingBox",style: TextStyle(color: Colors.red),),
               color: Colors.yellow,
               onPressed: (){
                 Navigator.of(context).pushNamed("padding_page",arguments: "padding_page");
