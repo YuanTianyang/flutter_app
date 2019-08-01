@@ -14,28 +14,6 @@ class CommonUtils  {
 
   static MySqlConnection Connection;
 
-  static bool MySqlIsOpen;
+  static bool IsOpenDB = false;
 
-  var readyCompleter = Completer();
-  Future get ready => readyCompleter.future;
-
-  NewsDbProvider() {
-    initMySqlConnection().then((_) {
-      // mark the provider ready when init completes
-      readyCompleter.complete();
-    });
-  }
-
-  static Future initMySqlConnection() async {
-    var settings = new ConnectionSettings(
-      host: '192.168.100.134',
-      port: 3306,
-      user: 'root',
-      password: '449534640',
-      db: 'test_app',
-    );
-    print("opening mysql");
-    var conn = await MySqlConnection.connect(settings);
-    print("opened mysql");
-  }
 }

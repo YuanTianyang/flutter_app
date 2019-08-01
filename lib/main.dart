@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_app/page/padding_test.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:flutter/src/widgets/basic.dart' as Basic;
 import 'common/dao/user_dao.dart';
@@ -9,7 +10,21 @@ import 'common/model/user.dart';
 import 'common/utils/common_utils.dart';
 
 void main() async {
-  return await runApp(MyApp());
+
+  var settings = new ConnectionSettings(
+    host: CommonUtils.HOST,
+    port: CommonUtils.PORT,
+    user: CommonUtils.USER,
+    password: CommonUtils.PASSWORD,
+    db: CommonUtils.DB,
+  );
+  print("opening mysql");
+  CommonUtils.Connection = await MySqlConnection.connect(settings);
+  if(null != CommonUtils.Connection){
+    CommonUtils.IsOpenDB = true;
+    print("opened mysql");
+  }
+  return runApp(MyApp());
 }
 
 //---------------容器类widget------------------
@@ -263,80 +278,6 @@ class ConstrainedBoXTestRoute extends StatelessWidget {
 }
 //-----------ConstrainedBoX限制子类widget大小------------------
 
-//------------padding给子节点添加补白------------
-class PaddingTestRoute extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-
-    var args = ModalRoute.of(context).settings.arguments;
-
-
-
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(args),
-        ),
-        body:Container(
-              child:ListView(
-                scrollDirection: Axis.horizontal,
-                children: <Widget>[
-                  Basic.Row(
-//                    mainAxisSize: MainAxisSize.min,
-//                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      MaterialButton(
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        child: Text("序号"),
-                        onPressed: () => {},
-                      ),
-                      MaterialButton(
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        child: Text("姓名"),
-                        onPressed: () => {},
-                      ),
-                      MaterialButton(
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        child: Text("年龄"),
-                        onPressed: () => {},
-                      ),
-                      MaterialButton(
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        child: Text("爱好"),
-                        onPressed: () => {},
-                      ),
-                      MaterialButton(
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        child: Text("电话"),
-                        onPressed: () => {},
-                      ),
-                      MaterialButton(
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        child: Text("住址"),
-                        onPressed: () => {},
-                      ),
-                      MaterialButton(
-                        color: Colors.blue,
-                        textColor: Colors.white,
-                        child: Text("操作"),
-                        onPressed: () => {},
-                      ),
-                    ],
-                  )
-                ],
-              ),
-
-          )
-    );
-  }
-}
-//------------padding给子节点添加补白------------
 
 
 //---------------容器类widget------------------
@@ -925,7 +866,6 @@ class CupertinoTestRoute extends StatelessWidget{
       )
     );
   }
-
 }
 //-----------CupertiNo组件库--------------
 
@@ -1314,8 +1254,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     var conn = CommonUtils.Connection;
     UserDao userDao = new UserDao();
-    var userList = userDao.getAllUser(conn, 0, 0);
-    print(userList.toString());
+    if(CommonUtils.IsOpenDB){
+      var userList = userDao.getAllUser(conn, 0, 0);
+      print(userList.toString());
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -1330,7 +1272,14 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text("PaddingBox",style: TextStyle(color: Colors.red),),
               color: Colors.yellow,
               onPressed: (){
-                Navigator.of(context).pushNamed("padding_page",arguments: "padding_page");
+                if(CommonUtils.IsOpenDB){
+                  UserDao userDao = new UserDao();
+                  userDao.getAllUser(conn, 0, 0).then((result){
+//                    Navigator.of(context).pushNamed("padding_page",arguments: result);
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context)=>PaddingTestRoute(userList:result)));
+                  });
+                }
               },
             ),
             CupertinoButton(

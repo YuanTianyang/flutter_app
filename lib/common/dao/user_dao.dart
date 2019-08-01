@@ -1,3 +1,4 @@
+import 'package:flutter_app/common/utils/common_utils.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:flutter_app/common/model/user.dart';
 
@@ -51,17 +52,18 @@ class UserDao {
 
   Future<List<User>> getAllUser(MySqlConnection conn, int page, int limit) async {
 
-    var results = await conn.query('SELECT id,user_name,age,hobby,phone,address FROM `user`');
-    List<User> userList = new List();
-    if(null != results){
-      for(var row in results){
-        User user = new User(row[0], row[1], row[2], row[3], row[4],row[5]);
-        userList.add(user);
+    if(CommonUtils.IsOpenDB && null != conn){
+      var results = await conn.query('SELECT id,user_name,age,hobby,phone,address FROM `user`');
+      List<User> userList = new List();
+      if(null != results){
+        for(var row in results){
+          User user = new User(row[0], row[1], row[2], row[3], row[4],row[5]);
+          userList.add(user);
+        }
+        return userList;
+      }else{
+        return null;
       }
-      return userList;
-    }else{
-      return null;
     }
-
   }
 }
