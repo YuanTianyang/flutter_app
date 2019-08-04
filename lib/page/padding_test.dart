@@ -16,23 +16,25 @@ class PaddingTestRoute extends StatefulWidget {
 
 class _PaddingTestState extends State<PaddingTestRoute> {
 
-  int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
-  int _sortColumnIndex;
-  bool _sortAscending = true;
-  UserDataSource _userDataSource = UserDataSource();
-
-  void _sort<T>(Comparable<T> getField(User d), int columnIndex, bool ascending) {
-    _userDataSource._sort<T>(getField, ascending);
-    setState(() {
-      _sortColumnIndex = columnIndex;
-      _sortAscending = ascending;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    _userDataSource._users = ModalRoute.of(context).settings.arguments;
-    print(_userDataSource._users.toString());
+
+    int _rowsPerPage = PaginatedDataTable.defaultRowsPerPage;
+    int _sortColumnIndex;
+    bool _sortAscending = true;
+    UserDataSource _userDataSource = UserDataSource();
+    _userDataSource._users = widget.userList;
+
+
+    void _sort<T>(Comparable<T> getField(User d), int columnIndex, bool ascending) {
+      _userDataSource._sort<T>(getField, ascending);
+      setState(() {
+        _sortColumnIndex = columnIndex;
+        _sortAscending = ascending;
+      });
+    }
+
+//    _userDataSource._users = ModalRoute.of(context).settings.arguments;
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
