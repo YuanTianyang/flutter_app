@@ -1253,11 +1253,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context)  {
 
     var conn = CommonUtils.Connection;
-    UserDao userDao = new UserDao();
-    if(CommonUtils.IsOpenDB){
-      var userList = userDao.getAllUser(conn, 0, 0);
-      print(userList.toString());
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -1279,7 +1274,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     Navigator.push(context, MaterialPageRoute(
                         builder: (context)=>PaddingTestRoute(userList:result)));
                   });
-                }
+                };
               },
             ),
             CupertinoButton(
