@@ -16,28 +16,35 @@ class PaddingTestRoute extends StatefulWidget {
 
 class _PaddingTestState extends State<PaddingTestRoute> {
 
+  List<User> _users = new List();
+  TextEditingController _userNameController = new TextEditingController();
+  TextEditingController _ageController = new TextEditingController();
+  TextEditingController _hobbyController = new TextEditingController();
+  TextEditingController _phoneController = new TextEditingController();
+  TextEditingController _addressController = new TextEditingController();
+  GlobalKey _formKey= new GlobalKey<FormState>();
 
+  Future<Null> _refreshUser() async{
+    UserDao userDao = UserDao();
+    userDao.getAllUser(CommonUtils.Connection, 0, 0).then((users){
+      setState(() {
+        _users.removeRange(0, _users.length);
+        _users.addAll(users);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    List<User> _users = widget.userList;
-
-    TextEditingController _userNameController = new TextEditingController();
-    TextEditingController _ageController = new TextEditingController();
-    TextEditingController _hobbyController = new TextEditingController();
-    TextEditingController _phoneController = new TextEditingController();
-    TextEditingController _addressController = new TextEditingController();
-    GlobalKey _formKey= new GlobalKey<FormState>();
-
-    void _refreshUser(List<User> users){
-      setState(() {
-        _users = users;
-      });
-      didUpdateWidget(this.widget);
-    }
+    _users = widget.userList;
 
     _addUserDialog() {
+      _userNameController.clear();
+      _ageController.clear();
+      _hobbyController.clear();
+      _phoneController.clear();
+      _addressController.clear();
       return SimpleDialog(
         title: Text('新增用户'),
         titlePadding: EdgeInsets.only(left: 100,top: 10),
@@ -161,7 +168,6 @@ class _PaddingTestState extends State<PaddingTestRoute> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 TextFormField(
-//                  initialValue: user.userName,
                   autofocus: false,
                   controller: _userNameController,
                   decoration: InputDecoration(
@@ -288,117 +294,112 @@ class _PaddingTestState extends State<PaddingTestRoute> {
         ),
         body: Container(
 //          padding: const EdgeInsets.all(13.0),
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: <Widget>[
-              _users == null
-              ?Center(child: CircularProgressIndicator())
-              :
-              Column(
+          child:
+            RefreshIndicator(
+              child: ListView(
+                scrollDirection: Axis.horizontal,
                 children: <Widget>[
-                  new Row(
+                  _users == null
+                      ?Center(child: CircularProgressIndicator())
+                      :
+                  Column(
                     children: <Widget>[
-                      new CupertinoButton(
-                        child: new Text("新增"),
-                        padding: EdgeInsets.only(left: 10),
-                        onPressed: () {
-                          showDialog<Null>(
-                            context: context,
-                            barrierDismissible: true,//点击dialog外部是否可以销毁
-                            builder: (BuildContext context) {
-                              return _addUserDialog();
+                      new Row(
+                        children: <Widget>[
+                          new CupertinoButton(
+                            child: new Text("新增"),
+                            padding: EdgeInsets.only(left: 10),
+                            onPressed: () {
+                              showDialog<Null>(
+                                context: context,
+                                barrierDismissible: true,//点击dialog外部是否可以销毁
+                                builder: (BuildContext context) {
+                                  return _addUserDialog();
+                                },
+                              ).then((v){
+                                _refreshUser();
+                              });
                             },
-                          ).then((v){
-                            UserDao userDao = UserDao();
-                            userDao.getAllUser(CommonUtils.Connection, 0, 0).then((users){
-                              _refreshUser(users);
-                            });
-                          });
-                        },
+                          ),
+                        ],
                       ),
+                      DataTable(
+                          columns: <DataColumn>[
+                            DataColumn(
+                              label: const Text('姓名'),
+                            ),
+                            DataColumn(
+                              label: const Text('年龄'),
+                              tooltip: 'The total amount of food energy in the given serving size.',
+                              numeric: true,
+                            ),
+                            DataColumn(
+                              label: const Text('爱好'),
+                            ),
+                            DataColumn(
+                              label: const Text('电话'),
+                              numeric: true,
+                            ),
+                            DataColumn(
+                              label: const Text('住址'),
+                            ),
+                            DataColumn(
+                              label: const Text('操作'),
+                            ),
+                          ],
+                          rows:_users.map((user){
+                            return DataRow(
+                                cells: [
+                                  DataCell(Text(user.userName)),
+                                  DataCell(Text(user.age.toString())),
+                                  DataCell(Text(user.hobby)),
+                                  DataCell(Text(user.phone)),
+                                  DataCell(Text(user.address)),
+                                  DataCell(
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          new RaisedButton(
+                                            child: new Text("修改"),
+                                            onPressed: () {
+                                              showDialog<Null>(
+                                                context: context,
+                                                barrierDismissible: true,//点击dialog外部是否可以销毁
+                                                builder: (BuildContext context) {
+                                                  return _updateUserDialog(user);
+                                                },
+                                              ).then((v){
+                                                _refreshUser();
+                                              });
+                                            },
+                                          ),
+                                          new RaisedButton(
+                                            child: new Text("删除"),
+                                            onPressed: () {
+                                              showDialog<Null>(
+                                                context: context,
+                                                barrierDismissible: true,//点击dialog外部是否可以销毁
+                                                builder: (BuildContext context) {
+                                                  return _deleteUserDialog(user);
+                                                },
+                                              ).then((v){
+                                                _refreshUser();
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      )
+                                  ),
+                                ]
+                            );
+                          }).toList()
+                      )
                     ],
                   ),
-                  DataTable(
-                      columns: <DataColumn>[
-                        DataColumn(
-                          label: const Text('姓名'),
-                        ),
-                        DataColumn(
-                          label: const Text('年龄'),
-                          tooltip: 'The total amount of food energy in the given serving size.',
-                          numeric: true,
-                        ),
-                        DataColumn(
-                          label: const Text('爱好'),
-                        ),
-                        DataColumn(
-                          label: const Text('电话'),
-                          numeric: true,
-                        ),
-                        DataColumn(
-                          label: const Text('住址'),
-                        ),
-                        DataColumn(
-                          label: const Text('操作'),
-                        ),
-                      ],
-                      rows:_users.map((user){
-                        return DataRow(
-                            cells: [
-                              DataCell(Text(user.userName)),
-                              DataCell(Text(user.age.toString())),
-                              DataCell(Text(user.hobby)),
-                              DataCell(Text(user.phone)),
-                              DataCell(Text(user.address)),
-                              DataCell(
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      new RaisedButton(
-                                        child: new Text("修改"),
-                                        onPressed: () {
-                                          showDialog<Null>(
-                                            context: context,
-                                            barrierDismissible: true,//点击dialog外部是否可以销毁
-                                            builder: (BuildContext context) {
-                                              return _updateUserDialog(user);
-                                            },
-                                          ).then((v){
-                                            UserDao userDao = UserDao();
-                                            userDao.getAllUser(CommonUtils.Connection, 0, 0).then((users){
-                                              _refreshUser(users);
-                                            });
-                                          });
-                                        },
-                                      ),
-                                      new RaisedButton(
-                                        child: new Text("删除"),
-                                        onPressed: () {
-                                          showDialog<Null>(
-                                            context: context,
-                                            barrierDismissible: true,//点击dialog外部是否可以销毁
-                                            builder: (BuildContext context) {
-                                              return _deleteUserDialog(user);
-                                            },
-                                          ).then((v){
-                                            UserDao userDao = UserDao();
-                                            userDao.getAllUser(CommonUtils.Connection, 0, 0).then((users){
-                                              _refreshUser(users);
-                                            });
-                                          });
-                                        },
-                                      ),
-                                    ],
-                                  )
-                              ),
-                            ]
-                        );
-                      }).toList()
-                  )
                 ],
               ),
-          ],
-          ),
+              onRefresh: _refreshUser,
+            )
       ),
       ),
     );
