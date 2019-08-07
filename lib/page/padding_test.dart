@@ -15,18 +15,17 @@ class PaddingTestRoute extends StatefulWidget {
 }
 
 class _PaddingTestState extends State<PaddingTestRoute> {
-
   List<User> _users = new List();
   TextEditingController _userNameController = new TextEditingController();
   TextEditingController _ageController = new TextEditingController();
   TextEditingController _hobbyController = new TextEditingController();
   TextEditingController _phoneController = new TextEditingController();
   TextEditingController _addressController = new TextEditingController();
-  GlobalKey _formKey= new GlobalKey<FormState>();
+  GlobalKey _formKey = new GlobalKey<FormState>();
 
-  Future<Null> _refreshUser() async{
+  Future<Null> _refreshUser() async {
     UserDao userDao = UserDao();
-    userDao.getAllUser(CommonUtils.Connection, 0, 0).then((users){
+    userDao.getAllUser(CommonUtils.Connection, 0, 0).then((users) {
       setState(() {
         _users.removeRange(0, _users.length);
         _users.addAll(users);
@@ -36,7 +35,6 @@ class _PaddingTestState extends State<PaddingTestRoute> {
 
   @override
   Widget build(BuildContext context) {
-
     _users = widget.userList;
 
     _addUserDialog() {
@@ -47,7 +45,7 @@ class _PaddingTestState extends State<PaddingTestRoute> {
       _addressController.clear();
       return SimpleDialog(
         title: Text('新增用户'),
-        titlePadding: EdgeInsets.only(left: 100,top: 10),
+        titlePadding: EdgeInsets.only(left: 100, top: 10),
         children: <Widget>[
           Form(
             key: _formKey, //设置globalKey，用于后面获取FormState
@@ -59,43 +57,37 @@ class _PaddingTestState extends State<PaddingTestRoute> {
                     autofocus: false,
                     controller: _userNameController,
                     decoration: InputDecoration(
-                        labelText: "姓名",
-                        hintText: "用户姓名或昵称",
+                      labelText: "姓名",
+                      hintText: "用户姓名或昵称",
                     ),
                     // 校验用户名
                     validator: (v) {
-                      return v
-                          .trim()
-                          .length > 0 ? null : "用户名不能为空";
-                    }
-
-                ),
+                      return v.trim().length > 0 ? null : "用户名不能为空";
+                    }),
                 TextFormField(
                     controller: _ageController,
                     decoration: InputDecoration(
-                        labelText: "年龄",
-                        hintText: "请正确输入年龄",
+                      labelText: "年龄",
+                      hintText: "请正确输入年龄",
                     ),
                     //校验年龄
                     validator: (v) {
-                      RegExp exp = RegExp(
-                          r'^(?:[1-9][0-9]?|1[01][0-9]|120)$');
+                      RegExp exp = RegExp(r'^(?:[1-9][0-9]?|1[01][0-9]|120)$');
                       bool matched = exp.hasMatch(v);
                       return matched ? null : "错误的年龄";
-                    }
-                ),
+                    }),
                 TextFormField(
-                    controller: _hobbyController,
-                    decoration: InputDecoration(
-                        labelText: "爱好",
-                        hintText: "喜欢或擅长的事情",
-                    ),
+                  controller: _hobbyController,
+                  decoration: InputDecoration(
+                    labelText: "爱好",
+                    hintText: "喜欢或擅长的事情",
+                  ),
                 ),
                 TextFormField(
                     controller: _phoneController,
                     decoration: InputDecoration(
-                        labelText: "电话",
-                        hintText: "请输入正确的移动号码",
+                      labelText: "电话",
+                      hintText: "请输入正确的移动号码",
                     ),
                     //校验密码
                     validator: (v) {
@@ -103,14 +95,13 @@ class _PaddingTestState extends State<PaddingTestRoute> {
                           r'^((13[0-9])|(14[0-9])|(15[0-9])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))\d{8}$');
                       bool matched = exp.hasMatch(v);
                       return matched ? null : "不是正确的电话号码";
-                    }
-                ),
+                    }),
                 TextFormField(
-                    controller: _addressController,
-                    decoration: InputDecoration(
-                        labelText: "住址",
-                        hintText: "请输入正确的住址",
-                    ),
+                  controller: _addressController,
+                  decoration: InputDecoration(
+                    labelText: "住址",
+                    hintText: "请输入正确的住址",
+                  ),
                 ),
                 Row(
                   children: <Widget>[
@@ -123,19 +114,20 @@ class _PaddingTestState extends State<PaddingTestRoute> {
                     new FlatButton(
                       child: new Text("确定"),
                       onPressed: () {
-                        if((_formKey.currentState as FormState).validate()){
+                        if ((_formKey.currentState as FormState).validate()) {
                           //验证通过提交数据
                           UserDao userDao = new UserDao();
-                          User user = new User(
-                              null,
-                              _userNameController.text,
-                              int.parse(_ageController.text),
-                              _hobbyController.text,
-                              _phoneController.text,
-                              _addressController.text
+                          User user = User(
+                            userName: _userNameController.text,
+                            age: int.parse(_ageController.text),
+                            hobby: _hobbyController.text,
+                            phone: _phoneController.text,
+                            address: _addressController.text,
                           );
-                          userDao.addUser(CommonUtils.Connection, user).then((v){
-                            if(v > 0){
+                          userDao
+                              .addUser(CommonUtils.Connection, user)
+                              .then((v) {
+                            if (v > 0) {
                               Navigator.of(context).pop();
                             }
                           });
@@ -159,7 +151,7 @@ class _PaddingTestState extends State<PaddingTestRoute> {
       _addressController.text = user.address;
       return SimpleDialog(
         title: Text('修改用户'),
-        titlePadding: EdgeInsets.only(left: 100,top: 10),
+        titlePadding: EdgeInsets.only(left: 100, top: 10),
         children: <Widget>[
           Form(
             key: _formKey, //设置globalKey，用于后面获取FormState
@@ -168,34 +160,28 @@ class _PaddingTestState extends State<PaddingTestRoute> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 TextFormField(
-                  autofocus: false,
-                  controller: _userNameController,
-                  decoration: InputDecoration(
-                    labelText: "姓名",
-                    hintText: "用户姓名或昵称",
-                  ),
-                  // 校验用户名
-                  validator: (v) {
-                    return v
-                        .trim()
-                        .length > 0 ? null : "用户名不能为空";
-                  }
-
-                ),
+                    autofocus: false,
+                    controller: _userNameController,
+                    decoration: InputDecoration(
+                      labelText: "姓名",
+                      hintText: "用户姓名或昵称",
+                    ),
+                    // 校验用户名
+                    validator: (v) {
+                      return v.trim().length > 0 ? null : "用户名不能为空";
+                    }),
                 TextFormField(
-                  controller: _ageController,
-                  decoration: InputDecoration(
-                    labelText: "年龄",
-                    hintText: "请正确输入年龄",
-                  ),
-                  //校验年龄
-                  validator: (v) {
-                    RegExp exp = RegExp(
-                        r'^(?:[1-9][0-9]?|1[01][0-9]|120)$');
-                    bool matched = exp.hasMatch(v);
-                    return matched ? null : "错误的年龄";
-                  }
-                ),
+                    controller: _ageController,
+                    decoration: InputDecoration(
+                      labelText: "年龄",
+                      hintText: "请正确输入年龄",
+                    ),
+                    //校验年龄
+                    validator: (v) {
+                      RegExp exp = RegExp(r'^(?:[1-9][0-9]?|1[01][0-9]|120)$');
+                      bool matched = exp.hasMatch(v);
+                      return matched ? null : "错误的年龄";
+                    }),
                 TextFormField(
                   controller: _hobbyController,
                   decoration: InputDecoration(
@@ -204,19 +190,18 @@ class _PaddingTestState extends State<PaddingTestRoute> {
                   ),
                 ),
                 TextFormField(
-                  controller: _phoneController,
-                  decoration: InputDecoration(
-                    labelText: "电话",
-                    hintText: "请输入正确的移动号码",
-                  ),
-                  //校验密码
-                  validator: (v) {
-                    RegExp exp = RegExp(
-                        r'^((13[0-9])|(14[0-9])|(15[0-9])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))\d{8}$');
-                    bool matched = exp.hasMatch(v);
-                    return matched ? null : "不是正确的电话号码";
-                  }
-                ),
+                    controller: _phoneController,
+                    decoration: InputDecoration(
+                      labelText: "电话",
+                      hintText: "请输入正确的移动号码",
+                    ),
+                    //校验密码
+                    validator: (v) {
+                      RegExp exp = RegExp(
+                          r'^((13[0-9])|(14[0-9])|(15[0-9])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))\d{8}$');
+                      bool matched = exp.hasMatch(v);
+                      return matched ? null : "不是正确的电话号码";
+                    }),
                 TextFormField(
                   controller: _addressController,
                   decoration: InputDecoration(
@@ -235,19 +220,21 @@ class _PaddingTestState extends State<PaddingTestRoute> {
                     new FlatButton(
                       child: new Text("确定"),
                       onPressed: () {
-                        if((_formKey.currentState as FormState).validate()){
+                        if ((_formKey.currentState as FormState).validate()) {
                           //验证通过提交数据
                           UserDao userDao = new UserDao();
-                          User newUser = new User(
-                              user.id,
-                              _userNameController.text,
-                              int.parse(_ageController.text),
-                              _hobbyController.text,
-                              _phoneController.text,
-                              _addressController.text
+                          User newUser = User(
+                            id: user.id,
+                            userName: _userNameController.text,
+                            age: int.parse(_ageController.text),
+                            hobby: _hobbyController.text,
+                            phone: _phoneController.text,
+                            address: _addressController.text,
                           );
-                          userDao.updateUser(CommonUtils.Connection, newUser).then((v){
-                            if(null != v){
+                          userDao
+                              .updateUser(CommonUtils.Connection, newUser)
+                              .then((v) {
+                            if (null != v) {
                               Navigator.of(context).pop();
                             }
                           });
@@ -263,7 +250,7 @@ class _PaddingTestState extends State<PaddingTestRoute> {
       );
     }
 
-    _deleteUserDialog(User user){
+    _deleteUserDialog(User user) {
       return AlertDialog(
         title: Text('确定删除当前用户?'),
         actions: <Widget>[
@@ -277,7 +264,7 @@ class _PaddingTestState extends State<PaddingTestRoute> {
             child: Text('确定'),
             onPressed: () {
               UserDao userDao = UserDao();
-              userDao.deleteUser(CommonUtils.Connection, user).then((n){
+              userDao.deleteUser(CommonUtils.Connection, user).then((n) {
                 Navigator.of(context).pop();
               });
             },
@@ -294,113 +281,109 @@ class _PaddingTestState extends State<PaddingTestRoute> {
         ),
         body: Container(
 //          padding: const EdgeInsets.all(13.0),
-          child:
-            RefreshIndicator(
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: <Widget>[
-                  _users == null
-                      ?Center(child: CircularProgressIndicator())
-                      :
-                  Column(
-                    children: <Widget>[
-                      new Row(
-                        children: <Widget>[
-                          new CupertinoButton(
-                            child: new Text("新增"),
-                            padding: EdgeInsets.only(left: 10),
-                            onPressed: () {
-                              showDialog<Null>(
-                                context: context,
-                                barrierDismissible: true,//点击dialog外部是否可以销毁
-                                builder: (BuildContext context) {
-                                  return _addUserDialog();
-                                },
-                              ).then((v){
-                                _refreshUser();
-                              });
-                            },
+            child: RefreshIndicator(
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: <Widget>[
+              _users == null
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+                  children: <Widget>[
+                    new Row(
+                      children: <Widget>[
+                        new CupertinoButton(
+                          child: new Text("新增"),
+                          padding: EdgeInsets.only(left: 10),
+                          onPressed: () {
+                            showDialog<Null>(
+                              context: context,
+                              barrierDismissible: true, //点击dialog外部是否可以销毁
+                              builder: (BuildContext context) {
+                                return _addUserDialog();
+                              },
+                            ).then((v) {
+                              _refreshUser();
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    DataTable(
+                        columns: <DataColumn>[
+                          DataColumn(
+                            label: const Text('姓名'),
+                          ),
+                          DataColumn(
+                            label: const Text('年龄'),
+                            tooltip:
+                                'The total amount of food energy in the given serving size.',
+                            numeric: true,
+                          ),
+                          DataColumn(
+                            label: const Text('爱好'),
+                          ),
+                          DataColumn(
+                            label: const Text('电话'),
+                            numeric: true,
+                          ),
+                          DataColumn(
+                            label: const Text('住址'),
+                          ),
+                          DataColumn(
+                            label: const Text('操作'),
                           ),
                         ],
-                      ),
-                      DataTable(
-                          columns: <DataColumn>[
-                            DataColumn(
-                              label: const Text('姓名'),
-                            ),
-                            DataColumn(
-                              label: const Text('年龄'),
-                              tooltip: 'The total amount of food energy in the given serving size.',
-                              numeric: true,
-                            ),
-                            DataColumn(
-                              label: const Text('爱好'),
-                            ),
-                            DataColumn(
-                              label: const Text('电话'),
-                              numeric: true,
-                            ),
-                            DataColumn(
-                              label: const Text('住址'),
-                            ),
-                            DataColumn(
-                              label: const Text('操作'),
-                            ),
-                          ],
-                          rows:_users.map((user){
-                            return DataRow(
-                                cells: [
-                                  DataCell(Text(user.userName)),
-                                  DataCell(Text(user.age.toString())),
-                                  DataCell(Text(user.hobby)),
-                                  DataCell(Text(user.phone)),
-                                  DataCell(Text(user.address)),
-                                  DataCell(
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          new RaisedButton(
-                                            child: new Text("修改"),
-                                            onPressed: () {
-                                              showDialog<Null>(
-                                                context: context,
-                                                barrierDismissible: true,//点击dialog外部是否可以销毁
-                                                builder: (BuildContext context) {
-                                                  return _updateUserDialog(user);
-                                                },
-                                              ).then((v){
-                                                _refreshUser();
-                                              });
-                                            },
-                                          ),
-                                          new RaisedButton(
-                                            child: new Text("删除"),
-                                            onPressed: () {
-                                              showDialog<Null>(
-                                                context: context,
-                                                barrierDismissible: true,//点击dialog外部是否可以销毁
-                                                builder: (BuildContext context) {
-                                                  return _deleteUserDialog(user);
-                                                },
-                                              ).then((v){
-                                                _refreshUser();
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      )
-                                  ),
-                                ]
-                            );
-                          }).toList()
-                      )
-                    ],
-                  ),
-                ],
-              ),
-              onRefresh: _refreshUser,
-            )
-      ),
+                        rows: _users.map((user) {
+                          return DataRow(cells: [
+                            DataCell(Text(user.userName)),
+                            DataCell(Text(user.age.toString())),
+                            DataCell(Text(user.hobby)),
+                            DataCell(Text(user.phone)),
+                            DataCell(Text(user.address)),
+                            DataCell(Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                new RaisedButton(
+                                  child: new Text("修改"),
+                                  onPressed: () {
+                                    showDialog<Null>(
+                                      context: context,
+                                      barrierDismissible:
+                                          true, //点击dialog外部是否可以销毁
+                                      builder: (BuildContext context) {
+                                        //此处可传入ID，然后在update方法处进行查询显示。
+                                        return _updateUserDialog(user);
+                                      },
+                                    ).then((v) {
+                                      _refreshUser();
+                                    });
+                                  },
+                                ),
+                                new RaisedButton(
+                                  child: new Text("删除"),
+                                  onPressed: () {
+                                    showDialog<Null>(
+                                      context: context,
+                                      barrierDismissible:
+                                          true, //点击dialog外部是否可以销毁
+                                      builder: (BuildContext context) {
+                                        return _deleteUserDialog(user);
+                                      },
+                                    ).then((v) {
+                                      _refreshUser();
+                                    });
+                                  },
+                                ),
+                              ],
+                            )),
+                          ]);
+                        }).toList())
+                  ],
+                ),
+            ],
+          ),
+          onRefresh: _refreshUser,
+        )),
       ),
     );
   }

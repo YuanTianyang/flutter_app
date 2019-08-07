@@ -39,8 +39,9 @@ class UserDao {
 
     var results = await conn.query('SELECT id,user_name,age,hobby,phone,address FROM `user` WHERE id = ?',[user.id]);
     if(null != results){
+      User user;
       for(var row in results){
-        User user = new User(row[0], row[1], row[2], row[3], row[4],row[5]);
+        user = new User(id:row[0], userName:row[1], age:row[2], hobby:row[3], phone:row[4], address:row[5]);
       }
       return user;
     }else{
@@ -57,7 +58,7 @@ class UserDao {
       List<User> userList = new List();
       if(null != results){
         for(var row in results){
-          User user = new User(row[0], row[1], row[2], row[3], row[4],row[5]);
+          User user = new User(id:row[0], userName:row[1], age:row[2], hobby:row[3], phone:row[4], address:row[5]);
           userList.add(user);
         }
         return userList;
