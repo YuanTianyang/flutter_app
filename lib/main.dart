@@ -395,9 +395,9 @@ class _ScaffoldRouteState extends State<ScaffoldBoxTestRoute>
         shape: CircularNotchedRectangle(), // 底部导航栏打一个圆形的洞
         child: Basic.Row(
           children: [
-            IconButton(icon: Icon(Icons.home)),
+            IconButton(icon: Icon(Icons.home), onPressed: () {},),
             SizedBox(), //中间位置空出
-            IconButton(icon: Icon(Icons.business)),
+            IconButton(icon: Icon(Icons.business), onPressed: () {},),
           ],
           mainAxisAlignment: MainAxisAlignment.spaceAround, //均分底部导航栏横向空间
         ),

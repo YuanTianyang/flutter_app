@@ -27,3 +27,7 @@ android/.gradle/4.10.2/fileHashes/fileHashes.lock
 android/.gradle/4.10.2/fileHashes/fileHashes.bin
 .idea/workspace.xml
 .idea/workspace.xml
+.metadata
+Twsited_flutter_app.iml
+flutter_01.log
+.gitattributes
