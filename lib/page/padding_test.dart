@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/common/dao/user_dao.dart';
 import 'package:flutter_app/common/model/user.dart';
 import 'package:flutter_app/common/utils/common_utils.dart';
+import 'package:dio/dio.dart';
 
 class PaddingTestRoute extends StatefulWidget {
   List<User> userList;
@@ -16,11 +17,13 @@ class PaddingTestRoute extends StatefulWidget {
 
 class _PaddingTestState extends State<PaddingTestRoute> {
   List<User> _users = new List();
+
   TextEditingController _userNameController = new TextEditingController();
   TextEditingController _ageController = new TextEditingController();
   TextEditingController _hobbyController = new TextEditingController();
   TextEditingController _phoneController = new TextEditingController();
   TextEditingController _addressController = new TextEditingController();
+
   GlobalKey _formKey = new GlobalKey<FormState>();
 
   Future<Null> _refreshUser() async {
@@ -33,9 +36,43 @@ class _PaddingTestState extends State<PaddingTestRoute> {
     });
   }
 
+  Dio dio = new Dio();
+  Future<Response> getLocationWeather() async {
+    var response = await dio.get("http://v.juhe.cn/weather/index?format=2&cityname=%e4%b9%90%e5%b1%b1&key=74561ef2bc60f44a2fc406ec2100927e");
+    if(null != response && response.statusCode == 200){
+      return response;
+    }else{
+      null;
+    }
+  }
+
+  var initUser;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getLocationWeather().then((result){
+        if(null != result){
+          debugPrint(result.toString());
+        }else{
+          print("---------------------请求失败-----------------------");
+        }
+    });
+
+    if (CommonUtils.IsOpenDB) {
+      UserDao userDao = new UserDao();
+      userDao.getAllUser(CommonUtils.Connection, 0, 0).then((result) {
+        initUser = result;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    _users = widget.userList;
+//    _users = widget.userList; //第二种路由传值
+    _users = initUser;//均可使用的传值
+//    _users = ModalRoute.of(context).settings.arguments; 第一只种路由传值
 
     _addUserDialog() {
       _userNameController.clear();
@@ -273,115 +310,115 @@ class _PaddingTestState extends State<PaddingTestRoute> {
       );
     }
 
-//    _userDataSource._users = ModalRoute.of(context).settings.arguments;
+
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: Text("padding_page"),
         ),
         body: Container(
-//          padding: const EdgeInsets.all(13.0),
+            //集合了下拉手势、加载指示器和刷新操作一体
             child: RefreshIndicator(
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: <Widget>[
-              _users == null
-                ? Center(child: CircularProgressIndicator())
-                : Column(
-                  children: <Widget>[
-                    new Row(
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: <Widget>[
+                  _users == null
+                    ? Center(child: CircularProgressIndicator())
+                    : Column(
                       children: <Widget>[
-                        new CupertinoButton(
-                          child: new Text("新增"),
-                          padding: EdgeInsets.only(left: 10),
-                          onPressed: () {
-                            showDialog<Null>(
-                              context: context,
-                              barrierDismissible: true, //点击dialog外部是否可以销毁
-                              builder: (BuildContext context) {
-                                return _addUserDialog();
+                        new Row(
+                          children: <Widget>[
+                            new CupertinoButton(
+                              child: new Text("新增"),
+                              padding: EdgeInsets.only(left: 10),
+                              onPressed: () {
+                                showDialog<Null>(
+                                  context: context,
+                                  barrierDismissible: true, //点击dialog外部是否可以销毁
+                                  builder: (BuildContext context) {
+                                    return _addUserDialog();
+                                  },
+                                ).then((v) {
+                                  _refreshUser();
+                                });
                               },
-                            ).then((v) {
-                              _refreshUser();
-                            });
-                          },
+                            ),
+                          ],
                         ),
+                        DataTable(
+                            columns: <DataColumn>[
+                              DataColumn(
+                                label: const Text('姓名'),
+                              ),
+                              DataColumn(
+                                label: const Text('年龄'),
+                                tooltip:
+                                    'The total amount of food energy in the given serving size.',
+                                numeric: true,
+                              ),
+                              DataColumn(
+                                label: const Text('爱好'),
+                              ),
+                              DataColumn(
+                                label: const Text('电话'),
+                                numeric: true,
+                              ),
+                              DataColumn(
+                                label: const Text('住址'),
+                              ),
+                              DataColumn(
+                                label: const Text('操作'),
+                              ),
+                            ],
+                            rows: _users.map((user) {
+                              return DataRow(cells: [
+                                DataCell(Text(user.userName)),
+                                DataCell(Text(user.age.toString())),
+                                DataCell(Text(user.hobby)),
+                                DataCell(Text(user.phone)),
+                                DataCell(Text(user.address)),
+                                DataCell(Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    new RaisedButton(
+                                      child: new Text("修改"),
+                                      onPressed: () {
+                                        showDialog<Null>(
+                                          context: context,
+                                          barrierDismissible:
+                                              true, //点击dialog外部是否可以销毁
+                                          builder: (BuildContext context) {
+                                            //此处可传入ID，然后在update方法处进行查询显示。
+                                            return _updateUserDialog(user);
+                                          },
+                                        ).then((v) {
+                                          _refreshUser();
+                                        });
+                                      },
+                                    ),
+                                    new RaisedButton(
+                                      child: new Text("删除"),
+                                      onPressed: () {
+                                        showDialog<Null>(
+                                          context: context,
+                                          barrierDismissible:
+                                              true, //点击dialog外部是否可以销毁
+                                          builder: (BuildContext context) {
+                                            return _deleteUserDialog(user);
+                                          },
+                                        ).then((v) {
+                                          _refreshUser();
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                )),
+                              ]);
+                            }).toList())
                       ],
                     ),
-                    DataTable(
-                        columns: <DataColumn>[
-                          DataColumn(
-                            label: const Text('姓名'),
-                          ),
-                          DataColumn(
-                            label: const Text('年龄'),
-                            tooltip:
-                                'The total amount of food energy in the given serving size.',
-                            numeric: true,
-                          ),
-                          DataColumn(
-                            label: const Text('爱好'),
-                          ),
-                          DataColumn(
-                            label: const Text('电话'),
-                            numeric: true,
-                          ),
-                          DataColumn(
-                            label: const Text('住址'),
-                          ),
-                          DataColumn(
-                            label: const Text('操作'),
-                          ),
-                        ],
-                        rows: _users.map((user) {
-                          return DataRow(cells: [
-                            DataCell(Text(user.userName)),
-                            DataCell(Text(user.age.toString())),
-                            DataCell(Text(user.hobby)),
-                            DataCell(Text(user.phone)),
-                            DataCell(Text(user.address)),
-                            DataCell(Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                new RaisedButton(
-                                  child: new Text("修改"),
-                                  onPressed: () {
-                                    showDialog<Null>(
-                                      context: context,
-                                      barrierDismissible:
-                                          true, //点击dialog外部是否可以销毁
-                                      builder: (BuildContext context) {
-                                        //此处可传入ID，然后在update方法处进行查询显示。
-                                        return _updateUserDialog(user);
-                                      },
-                                    ).then((v) {
-                                      _refreshUser();
-                                    });
-                                  },
-                                ),
-                                new RaisedButton(
-                                  child: new Text("删除"),
-                                  onPressed: () {
-                                    showDialog<Null>(
-                                      context: context,
-                                      barrierDismissible:
-                                          true, //点击dialog外部是否可以销毁
-                                      builder: (BuildContext context) {
-                                        return _deleteUserDialog(user);
-                                      },
-                                    ).then((v) {
-                                      _refreshUser();
-                                    });
-                                  },
-                                ),
-                              ],
-                            )),
-                          ]);
-                        }).toList())
-                  ],
-                ),
-            ],
-          ),
+                ],
+              ),
           onRefresh: _refreshUser,
         )),
       ),
