@@ -11,7 +11,6 @@ import 'common/utils/common_utils.dart';
 
 void main() async {
   // void main() => runApp(new MyApp());
-
   var settings = new ConnectionSettings(
     host: CommonUtils.HOST,
     port: CommonUtils.PORT,
